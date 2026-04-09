@@ -13,13 +13,13 @@
 # limitations under the License.
 
 ## ------- import packages -------
-
-
+from dwave.system import LeapHybridNLSampler
+from dwave.optimization import Model
 
 def set_sampler():
     """Return a sampler"""
     ## TODO: Import the package and add sampler here
-    
+    sampler = LeapHybridNLSampler()
 
     return sampler
 
@@ -52,7 +52,7 @@ def build_nl(values, weights, capacity, max_items_allowed):
     """
    
     ## TODO: Import the package and construct the model
-	
+    model = Model()
 
     # Create the binary variables 
     nbr_items = len(weights)
@@ -65,11 +65,12 @@ def build_nl(values, weights, capacity, max_items_allowed):
     max_items_allowed = model.constant(max_items_allowed)
 
     ## TODO: Set the objective mentioned in the README
-	
+    model.minimize((-values*x).sum())
 
     ## TODO: Add constraints to reflect the restrictions in the README
-	
-	
+    model.add_constraint((weights*x).sum() <= capacity)
+
+    model.add_constraint(x.sum() <= max_items_allowed)    	
         
     return model
 
@@ -105,3 +106,5 @@ if __name__ == "__main__":
     with model.lock():
         current_state = 0
         print(f"For state {current_state}, {list(sym.state(current_state) for sym in model.iter_decisions())} results in objective {model.objective.state(current_state)}")
+
+# For state 0, [array([1., 0., 0., 0., 1.])] results in objective -98.0
